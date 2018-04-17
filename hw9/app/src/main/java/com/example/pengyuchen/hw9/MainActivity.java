@@ -10,8 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -21,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView img_cursor;
     private TextView tv_one;
     private TextView tv_two;
-
+    private Button search;
 
     private ArrayList<View> listViews;
     private int offset = 0;//移动条图片的偏移量
@@ -35,6 +37,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
+        //Button search = (Button) findViewById(R.id.search);
+        //search.setOnClickListener(this);
+//
+//        btn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//               Toast.makeText(MainActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+
     }
 
 
@@ -43,6 +55,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tv_one = (TextView) findViewById(R.id.tv_one);
         tv_two = (TextView) findViewById(R.id.tv_two);
         img_cursor = (ImageView) findViewById(R.id.img_cursor);
+        search = (Button) findViewById(R.id.search);
+
+
 
         //下划线动画的相关设置：
         bmpWidth = 400;// 获取图片宽度
@@ -67,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         vpager.setCurrentItem(0);          //设置ViewPager当前页，从0开始算
         tv_one.setOnClickListener(this);
         tv_two.setOnClickListener(this);
-
+        //search.setOnClickListener(this);
         vpager.addOnPageChangeListener(this);
     }
 
@@ -79,6 +94,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.tv_two:
                 vpager.setCurrentItem(1);
+                break;
+            case R.id.search:
+                //Toast.makeText(MainActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
                 break;
 
         }

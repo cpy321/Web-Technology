@@ -11,8 +11,16 @@
         android:layout_height="wrap_content"
         android:text="Keyword" />
 
+    <TextView
+        android:id="@+id/warning1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Please enter mandatory field"
+        android:textColor="#FF0000"
+        android:visibility="gone" />
+
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/keyword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -22,7 +30,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Category" />
+        android:text="Category"
+        />
 
     <Spinner
         android:id="@+id/spinner"
@@ -47,19 +56,38 @@
         android:layout_height="wrap_content"
         android:text="From" />
 
-    <RadioButton
+    <RadioGroup
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Current location" />
+        >
 
-    <RadioButton
+        <RadioButton
+            android:id="@+id/radio1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Current location"
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/radio2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Other. Specify Location" />
+    </RadioGroup>
+
+
+    <TextView
+        android:id="@+id/warning2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Other. Specify Location" />
+        android:text="Please enter mandatory field"
+        android:textColor="#FF0000"
+        android:visibility="gone" />
 
     <AutoCompleteTextView
-        android:layout_height="wrap_content"
+        android:id="@+id/location"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:ems="10"
         android:hint="Type in the Location"
