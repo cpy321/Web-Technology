@@ -1,11 +1,20 @@
 package com.example.pengyuchen.hw91;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,24 +35,25 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+
+import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 public class MainActivity extends AppCompatActivity {
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
     private ViewPager mViewPager;
+    private LocationManager locationManager;
+    private String provider;
 
+    public static double lat;
+    public static double lon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,19 +72,60 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+        tabLayout.setTabMode(TabLayout.MODE_FIXED);
 //        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 //        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
-        tabLayout.setTabMode(TabLayout.MODE_FIXED);
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
+
+
+
+        locationManager=(LocationManager)getSystemService(Context.LOCATION_SERVICE);
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.v("error", Manifest.permission.ACCESS_FINE_LOCATION);
+
+        }
+
+
+
+        Location location=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if(location!=null){
+            lon = location.getLongitude();
+            lat = location.getLatitude();
+            String currentPosition="latitude is"+lat+"\n"+"longitude is"+lon;
+            Log.v("msg",currentPosition);
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,10,locationListener);
 
     }
+
+
+    LocationListener locationListener=new LocationListener(){
+
+        @Override
+        public void onLocationChanged(Location location) {
+            lon = location.getLongitude();
+            lat = location.getLatitude();
+            String currentPosition="latitude is"+lat+"\n"+"longitude is"+lon;
+            Log.v("msg",currentPosition);
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
 
 
     @Override
@@ -149,33 +200,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-//        public CharSequence getPageTitle(int position) {
-//            Drawable drawable;
-//            String title;
-//            switch (position) {
-//                case 0:
-//                    drawable = ContextCompat.getDrawable(mContext, R.drawable.search_icon);
-//                    title="RESULTS";
-//                    break;
-//                case 1:
-//                    drawable = ContextCompat.getDrawable(mContext, R.drawable.heart_fill_white);
-//                    title="FAVORITES";
-//                    break;
-//                default:
-//                    drawable = ContextCompat.getDrawable(mContext, R.drawable.search_icon);
-//                    title="RESULTS";
-//                    break;
-//            }
-//
-//            drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-//            ImageSpan imageSpan = new ImageSpan(drawable, ImageSpan.ALIGN_BOTTOM);
-//            SpannableString spannableString = new SpannableString(" " + title);
-//            spannableString.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//
-//            return spannableString;
-//        }
-
-
-
     }
+
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == 1) {
+//            if (resultCode == RESULT_OK) {
+//                Place place = PlaceAutocomplete.getPlace(this, data);
+//                Log.i(TAG, "Place: " + place.getName());
+//            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+//                Status status = PlaceAutocomplete.getStatus(this, data);
+//                // TODO: Handle the error.
+//                Log.i(TAG, status.getStatusMessage());
+//
+//            } else if (resultCode == RESULT_CANCELED) {
+//                // The user canceled the operation.
+//            }
+//        }
+//    }
 }
