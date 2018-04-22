@@ -2,7 +2,10 @@ package com.example.pengyuchen.hw91;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Entity;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -14,7 +17,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.content.SharedPreferences;
+import android.widget.Toast;
 
 
 import com.android.volley.Request;
@@ -29,10 +35,12 @@ import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
 
+import static java.lang.Math.E;
+
 public class resultActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
-
-    private RecyclerView.Adapter mAdapter;
+    private SharedPreferences sp ;
+    private MyAdapter mAdapter;
 
     private RecyclerView.LayoutManager mLayoutManager;
 
@@ -129,6 +137,7 @@ public class resultActivity extends AppCompatActivity {
         });
 
 
+
         initData();
         initView();
 
@@ -159,6 +168,39 @@ public class resultActivity extends AppCompatActivity {
 
             mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
             mAdapter = new MyAdapter(getData());
+            mAdapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
+                String resultLike = obj.get("results").toString();
+                JSONArray likeArray = JSONArray.fromObject(resultLike);
+
+                @Override
+                public void onItemLike(ImageView view, int position) {
+
+                    if(view.getDrawable().getCurrent().getConstantState()==getResources().getDrawable(R.drawable.heart_black).getConstantState()){
+                        view.setImageResource(R.drawable.heart_fill_red);
+                        sp = getSharedPreferences("Favorite", Context.MODE_PRIVATE);
+
+                        String key = likeArray.getJSONObject(position).getString("place_id").toString();
+                        String val = likeArray.getJSONObject(position).toString();
+                        SharedPreferences.Editor editor = sp.edit();
+                        editor.putString(key, val);
+
+                    }else{
+                        view.setImageResource(R.drawable.heart_black);
+                    }
+
+                }
+
+                @Override
+                public void onItemDetail(View view, int position) {
+                    Intent intent = new Intent();
+                    intent.setClass(resultActivity.this, detailActivity.class);
+                    intent.putExtra("fromResult", likeArray.getJSONObject(position).getString("place_id").toString());
+                    startActivity(intent);
+                }
+            });
+
+
+
 
         }else{
             findViewById(R.id.resultWarning).setVisibility(TextView.VISIBLE);
@@ -173,6 +215,7 @@ public class resultActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
         // 设置adapter
         mRecyclerView.setAdapter(mAdapter);
+
     }
 
     private ArrayList<entity> getData( ) {
@@ -182,7 +225,7 @@ public class resultActivity extends AppCompatActivity {
 
         for (int i = 0; i < jsonArray.size(); i++) {
             String icon = jsonArray.getJSONObject(i).getString("icon");
-            Log.v("123",icon);
+
             list.add(new entity(jsonArray.getJSONObject(i).getString("icon"), jsonArray.getJSONObject(i).getString("name"), jsonArray.getJSONObject(i).getString("vicinity")));
         }
 

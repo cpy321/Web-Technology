@@ -1,67 +1,67 @@
 package com.example.pengyuchen.hw91;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.Service;
+
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
-import java.util.List;
 
-import static android.content.ContentValues.TAG;
-
-public class MainActivity extends AppCompatActivity {
+public class detailActivity extends AppCompatActivity {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
-    private LocationManager locationManager;
-    private String provider;
-
-    public static double lat;
-    public static double lon;
+    private JSONObject resultJson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
+        setContentView(R.layout.detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        String result = bundle.getString("fromResult");
+        //resultJson = JSONObject.fromObject(result);
+        toolbar.setTitle(result);
+
+
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        toolbar.setOnMenuItemClickListener(onMenuItemClick);
+
+
+
+
+
+
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(),this);
@@ -72,58 +72,31 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-        tabLayout.setTabMode(TabLayout.MODE_FIXED);
+        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
 //        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 //        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
 
-
-        locationManager=(LocationManager)getSystemService(Context.LOCATION_SERVICE);
-
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.v("error", Manifest.permission.ACCESS_FINE_LOCATION);
-
-        }
-
-
-
-        Location location=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if(location!=null){
-            lon = location.getLongitude();
-            lat = location.getLatitude();
-            String currentPosition="latitude is"+lat+"\n"+"longitude is"+lon;
-            Log.v("msg",currentPosition);
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,10,locationListener);
-
     }
 
-
-    LocationListener locationListener=new LocationListener(){
-
+    private Toolbar.OnMenuItemClickListener onMenuItemClick = new Toolbar.OnMenuItemClickListener() {
         @Override
-        public void onLocationChanged(Location location) {
-            lon = location.getLongitude();
-            lat = location.getLatitude();
-            String currentPosition="latitude is"+lat+"\n"+"longitude is"+lon;
-            Log.v("msg",currentPosition);
-        }
+        public boolean onMenuItemClick(MenuItem menuItem) {
+            String msg = "";
+            switch (menuItem.getItemId()) {
+                case R.id.action_share:
+                    msg += "Click edit";
+                    break;
+                case R.id.action_like:
+                    msg += "Click share";
+                    break;
 
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
 
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-
+            if(!msg.equals("")) {
+                Toast.makeText(detailActivity.this, msg, Toast.LENGTH_SHORT).show();
+            }
+            return true;
         }
     };
 
@@ -131,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_detail, menu);
         return true;
     }
 
@@ -152,10 +125,13 @@ public class MainActivity extends AppCompatActivity {
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
         private Context mContext;
-        private String tabTitles[] = new String[]{"RESULTS", "FAVORITES"};
-        private int[] imageResId = {R.drawable.search_icon,
-                R.drawable.heart_fill_white,
-                };
+        private String tabTitles[] = new String[]{"INFO", "PHOTOS", "MAP", "REVIEWS"};
+        private int[] imageResId = {
+                R.drawable.info_outline,
+                R.drawable.photos,
+                R.drawable.maps,
+                R.drawable.review
+        };
 
         public SectionsPagerAdapter(FragmentManager fm, Context context) {
             super(fm);
@@ -167,11 +143,17 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    searchFragment tab1 = new searchFragment();
+                    infoFragment tab1 = new infoFragment();
                     return tab1;
                 case 1:
-                    favoriteFragment tab2 = new favoriteFragment();
+                    photoFragment tab2 = new photoFragment();
                     return tab2;
+                case 2:
+                    mapFrament tab3 = new mapFrament();
+                    return tab3;
+                case 3:
+                    reviewFrament tab4 = new reviewFrament();
+                    return tab4;
 
                 default:
                     return null;
@@ -182,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 2;
+            return 4;
         }
         @Override
         public CharSequence getPageTitle(int position) {

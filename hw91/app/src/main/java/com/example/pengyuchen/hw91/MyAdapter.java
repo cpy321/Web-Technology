@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
 
     private ArrayList<entity> mData;
+    private MyAdapter.OnItemClickListener onItemClickListener;
+
 
     public MyAdapter(ArrayList<entity> data) {
         this.mData = data;
@@ -26,20 +29,51 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
         notifyDataSetChanged();
     }
 
-    @Override
+    public interface OnItemClickListener {
+        void onItemLike(ImageView view, int position);
+        void onItemDetail(View view, int position);
+    }
+
+    public void setOnItemClickListener(MyAdapter.OnItemClickListener listener) {
+        this.onItemClickListener = listener;
+    }
+
+        @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // 实例化展示的view
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_rv_item, parent, false);
         // 实例化viewholder
         ViewHolder viewHolder = new ViewHolder(v);
+
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         // 绑定数据
-        ViewHolder vh = (ViewHolder)  holder;
-        //holder.mTv.setText(mData.get(position));
+        final ViewHolder vh = (ViewHolder)  holder;
+        final ImageView heartView = vh.itemView.findViewById(R.id.resultcol4);
+        final View detailView= (View)vh.itemView.findViewById(R.id.detailView);
+
+        heartView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if(onItemClickListener != null) {
+                    int pos = vh.getLayoutPosition();
+                    onItemClickListener.onItemLike(heartView, pos);
+                }
+            }
+        });
+
+        detailView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if(onItemClickListener != null) {
+                    int pos = vh.getLayoutPosition();
+                    onItemClickListener.onItemDetail(detailView, pos);
+                }
+            }
+        });
 
 
         Picasso.get().load(mData.get(position).getItem1()).resize(110, 110).into(vh.getTv_Item1());
@@ -79,6 +113,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
             return tv_sheetRow3;
         }
     }
+
+
+
+
 }
 
 
