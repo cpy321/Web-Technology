@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"></uses-permission>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-feature android:name="android.hardware.location.gps" />
     <application
         android:allowBackup="true"
@@ -38,6 +39,6 @@
 
     <meta-data
         android:name="com.google.android.geo.API_KEY"
-        android:value="AIzaSyBujGjblZKUI3x7RPPeuuibylg57cxIikg"/>
+        android:value="AIzaSyAS8oAJOvlirAaUcFriQE0QqTkrHAb8zl4"/>
 
 </manifest>

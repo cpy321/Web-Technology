@@ -54,7 +54,7 @@ public class resultActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.result);
-
+        final RequestQueue queue = Volley.newRequestQueue(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.resultToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -68,7 +68,7 @@ public class resultActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        final RequestQueue queue = Volley.newRequestQueue(this);
+
 
         page = 0;
         resultData.add(bundle.getString("fromMain"));
@@ -192,10 +192,42 @@ public class resultActivity extends AppCompatActivity {
 
                 @Override
                 public void onItemDetail(View view, int position) {
-                    Intent intent = new Intent();
-                    intent.setClass(resultActivity.this, detailActivity.class);
-                    intent.putExtra("fromResult", likeArray.getJSONObject(position).getString("place_id").toString());
-                    startActivity(intent);
+                    final ProgressDialog pDialog = new ProgressDialog(resultActivity.this);
+                    final RequestQueue queue = Volley.newRequestQueue(resultActivity.this);
+                    pDialog.setMessage("Fetching details");
+                    pDialog.show();
+                    String placeId = likeArray.getJSONObject(position).getString("place_id").toString();
+
+                    String url = "http://place-env.us-west-1.elasticbeanstalk.com/detail?place_id="+placeId;
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                            (Request.Method.GET, url, null, new Response.Listener<org.json.JSONObject>() {
+                                @Override
+                                public void onResponse(org.json.JSONObject response) {
+                                    String detailJson=response.toString();
+                                    Intent intent = new Intent();
+                                    intent.setClass(resultActivity.this, detailActivity.class);
+                                    intent.putExtra("fromResult", detailJson);
+                                    startActivity(intent);
+                                    pDialog.hide();
+
+                                    //Log.v("msg", detailJson);
+
+                                }
+                            }, new Response.ErrorListener() {
+
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Log.v("msg", error.toString());
+                                    Intent intent = new Intent();
+                                    intent.setClass(resultActivity.this, detailActivity.class);
+                                    intent.putExtra("fromResult", "error");
+                                    startActivity(intent);
+                                    pDialog.hide();
+
+                                }
+                            });
+                    queue.add(jsonObjectRequest);
+
                 }
             });
 

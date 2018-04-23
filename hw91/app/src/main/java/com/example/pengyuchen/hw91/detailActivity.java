@@ -1,6 +1,8 @@
 package com.example.pengyuchen.hw91;
 
 
+import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -8,6 +10,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -23,6 +26,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -31,20 +41,26 @@ public class detailActivity extends AppCompatActivity {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
-    private JSONObject resultJson;
+    private String detail;
+    private JSONObject detailObj;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        RequestQueue queue = Volley.newRequestQueue(this);
         
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        String result = bundle.getString("fromResult");
         //resultJson = JSONObject.fromObject(result);
-        toolbar.setTitle(result);
-
+        //toolbar.setTitle(result);
+        String detailJson = bundle.getString("fromResult");
+        setmTitle(detailJson);
+        detailObj = JSONObject.fromObject(detailJson);
+        JSONObject resultObj = (JSONObject)detailObj.get("result");
+        String title = resultObj.get("name").toString();
+        toolbar.setTitle(title);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -55,11 +71,7 @@ public class detailActivity extends AppCompatActivity {
             }
         });
         toolbar.setOnMenuItemClickListener(onMenuItemClick);
-
-
-
-
-
+        //Log.v("msg", detailJson);
 
 
         // Create the adapter that will return a fragment for each of the three
@@ -77,6 +89,14 @@ public class detailActivity extends AppCompatActivity {
 //        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
 
+    }
+
+    public String getmTitle() {
+        return detail;
+    }
+
+    public void setmTitle(String title) {
+        this.detail = title;
     }
 
     private Toolbar.OnMenuItemClickListener onMenuItemClick = new Toolbar.OnMenuItemClickListener() {
