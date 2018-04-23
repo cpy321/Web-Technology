@@ -90,6 +90,29 @@ app.get('/next', function (req, res) {
 
 })
 
+
+
+app.get('/detail', function (req, res) {
+    console.log('connected');
+    res.header('Access-Control-Allow-Origin','*');
+
+    var placeID = req.query.place_id;
+    var url = "https://maps.googleapis.com/maps/api/place/details/json?placeid="+placeID+"&key=AIzaSyCxF6BWr5FLMiSJyD5DYjDvPDVQHUB3Bco";
+    request2(url, function (err, response, body) {
+        if (!err) {
+            var detailJson = JSON.parse(body);
+            console.log(detailJson);
+            res.send(detailJson);
+        }
+    })
+
+
+})
+
+
+
+
+
 app.get('/yelp', function (req, res) {
     console.log('connected');
     res.header('Access-Control-Allow-Origin','*');
