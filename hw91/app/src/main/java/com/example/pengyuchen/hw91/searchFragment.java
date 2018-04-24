@@ -107,7 +107,7 @@ public class searchFragment extends Fragment {
                         url+="&category="+URLEncoder.encode(categoryInput);
                         url+="&inputDistance="+distanceInput;
                         url+="&gridRadios="+girdRadios;
-                        if(girdRadios == "option2") url+="&gridRadios="+URLEncoder.encode(locationInput);
+                        if(girdRadios == "option2") url+="&inputLocation="+URLEncoder.encode(locationInput);
                         url+="&lat="+lat;
                         url+="&lon="+lon;
 

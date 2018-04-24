@@ -1,15 +1,11 @@
 package com.example.pengyuchen.hw91;
 
 
-import android.app.FragmentTransaction;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -20,28 +16,23 @@ import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 
-public class detailActivity extends AppCompatActivity {
+public class detailActivity extends AppCompatActivity{
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private String detail;
+    private String placeId;
     private JSONObject detailObj;
 
     @Override
@@ -56,6 +47,8 @@ public class detailActivity extends AppCompatActivity {
         //resultJson = JSONObject.fromObject(result);
         //toolbar.setTitle(result);
         String detailJson = bundle.getString("fromResult");
+        setPlaceId( bundle.getString("fromResultPlaceId"));
+
         setmTitle(detailJson);
         detailObj = JSONObject.fromObject(detailJson);
         JSONObject resultObj = (JSONObject)detailObj.get("result");
@@ -91,6 +84,7 @@ public class detailActivity extends AppCompatActivity {
 
     }
 
+
     public String getmTitle() {
         return detail;
     }
@@ -98,6 +92,15 @@ public class detailActivity extends AppCompatActivity {
     public void setmTitle(String title) {
         this.detail = title;
     }
+
+    public String getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
+    }
+
 
     private Toolbar.OnMenuItemClickListener onMenuItemClick = new Toolbar.OnMenuItemClickListener() {
         @Override
@@ -169,10 +172,10 @@ public class detailActivity extends AppCompatActivity {
                     photoFragment tab2 = new photoFragment();
                     return tab2;
                 case 2:
-                    mapFrament tab3 = new mapFrament();
+                    mapFragment tab3 = new mapFragment();
                     return tab3;
                 case 3:
-                    reviewFrament tab4 = new reviewFrament();
+                    reviewFragment tab4 = new reviewFragment();
                     return tab4;
 
                 default:

@@ -31,5 +31,16 @@
         <item value="travel agency">Travel Agency</item>
         <item value="zoo">Zoo</item>
     </string-array>
+    <string-array name="spinner1">
+        <item>Google Reviews</item>
+        <item>Yelp Reviews</item>
+    </string-array>
+    <string-array name="spinner2">
+        <item>Default Order</item>
+        <item>Highest Rating</item>
+        <item>Lowest Rating</item>
+        <item>Most Recent</item>
+        <item>Least Recent</item>
+    </string-array>
 
 </resources>

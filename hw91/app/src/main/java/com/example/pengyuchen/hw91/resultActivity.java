@@ -145,7 +145,7 @@ public class resultActivity extends AppCompatActivity {
     }
 
     private void initData() {
-        Log.v("msg",Integer.toString(resultData.size()));
+
         obj = JSONObject.fromObject(resultData.get(page));
         String status = obj.get("status").toString();
         Object nextPage = obj.get("next_page_token");
@@ -196,7 +196,7 @@ public class resultActivity extends AppCompatActivity {
                     final RequestQueue queue = Volley.newRequestQueue(resultActivity.this);
                     pDialog.setMessage("Fetching details");
                     pDialog.show();
-                    String placeId = likeArray.getJSONObject(position).getString("place_id").toString();
+                    final String placeId = likeArray.getJSONObject(position).getString("place_id").toString();
 
                     String url = "http://place-env.us-west-1.elasticbeanstalk.com/detail?place_id="+placeId;
                     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -207,6 +207,7 @@ public class resultActivity extends AppCompatActivity {
                                     Intent intent = new Intent();
                                     intent.setClass(resultActivity.this, detailActivity.class);
                                     intent.putExtra("fromResult", detailJson);
+                                    intent.putExtra("fromResultPlaceId", placeId);
                                     startActivity(intent);
                                     pDialog.hide();
 
@@ -256,7 +257,6 @@ public class resultActivity extends AppCompatActivity {
         JSONArray jsonArray = JSONArray.fromObject(result);
 
         for (int i = 0; i < jsonArray.size(); i++) {
-            String icon = jsonArray.getJSONObject(i).getString("icon");
 
             list.add(new entity(jsonArray.getJSONObject(i).getString("icon"), jsonArray.getJSONObject(i).getString("name"), jsonArray.getJSONObject(i).getString("vicinity")));
         }
