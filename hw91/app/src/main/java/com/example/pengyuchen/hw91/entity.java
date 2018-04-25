@@ -12,10 +12,13 @@ public class entity {
     //第三列表头
     private String sheetRow3;
 
-    public entity(String sheetRow1, String sheetRow2, String sheetRow3) {
+    private int sheetRow4;
+
+    public entity(String sheetRow1, String sheetRow2, String sheetRow3, int sheetRow4) {
         this.sheetRow1 = sheetRow1;
         this.sheetRow2 = sheetRow2;
         this.sheetRow3 = sheetRow3;
+        this.sheetRow4 = sheetRow4;
     }
 
     public String getItem1() {
@@ -40,5 +43,13 @@ public class entity {
 
     public void setItem3(String sheetRow3) {
         this.sheetRow3 = sheetRow3;
+    }
+
+    public int getItem4() {
+        return sheetRow4;
+    }
+
+    public void setItem4(int sheetRow4) {
+        this.sheetRow4 = sheetRow4;
     }
 }

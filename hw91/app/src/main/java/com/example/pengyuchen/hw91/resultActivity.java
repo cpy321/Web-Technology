@@ -144,6 +144,14 @@ public class resultActivity extends AppCompatActivity {
 
     }
 
+    @Override
+
+    public void onResume(){
+        super.onResume();
+        initData();
+        initView();
+    }
+
     private void initData() {
 
         obj = JSONObject.fromObject(resultData.get(page));
@@ -174,19 +182,21 @@ public class resultActivity extends AppCompatActivity {
 
                 @Override
                 public void onItemLike(ImageView view, int position) {
+                    sp = getSharedPreferences("Favorite", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    String key = likeArray.getJSONObject(position).getString("place_id").toString();
+                    String val = likeArray.getJSONObject(position).toString();
 
                     if(view.getDrawable().getCurrent().getConstantState()==getResources().getDrawable(R.drawable.heart_black).getConstantState()){
                         view.setImageResource(R.drawable.heart_fill_red);
-                        sp = getSharedPreferences("Favorite", Context.MODE_PRIVATE);
 
-                        String key = likeArray.getJSONObject(position).getString("place_id").toString();
-                        String val = likeArray.getJSONObject(position).toString();
-                        SharedPreferences.Editor editor = sp.edit();
                         editor.putString(key, val);
 
                     }else{
                         view.setImageResource(R.drawable.heart_black);
+                        editor.remove(key);
                     }
+                    editor.commit();
 
                 }
 
@@ -197,6 +207,10 @@ public class resultActivity extends AppCompatActivity {
                     pDialog.setMessage("Fetching details");
                     pDialog.show();
                     final String placeId = likeArray.getJSONObject(position).getString("place_id").toString();
+                    final String name = likeArray.getJSONObject(position).getString("name").toString();
+                    final String vicinity = likeArray.getJSONObject(position).getString("vicinity").toString();
+                    final String icon = likeArray.getJSONObject(position).getString("icon").toString();
+
 
                     String url = "http://place-env.us-west-1.elasticbeanstalk.com/detail?place_id="+placeId;
                     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -208,6 +222,9 @@ public class resultActivity extends AppCompatActivity {
                                     intent.setClass(resultActivity.this, detailActivity.class);
                                     intent.putExtra("fromResult", detailJson);
                                     intent.putExtra("fromResultPlaceId", placeId);
+                                    intent.putExtra("fromResultPlaceName", name);
+                                    intent.putExtra("fromResultAddress",vicinity);
+                                    intent.putExtra("fromResultIcon",icon);
                                     startActivity(intent);
                                     pDialog.hide();
 
@@ -255,10 +272,21 @@ public class resultActivity extends AppCompatActivity {
         ArrayList<entity> list = new ArrayList<entity>();
         String result = obj.get("results").toString();
         JSONArray jsonArray = JSONArray.fromObject(result);
+        sp = getSharedPreferences("Favorite", Context.MODE_PRIVATE);
+
+
 
         for (int i = 0; i < jsonArray.size(); i++) {
+            String place_id = jsonArray.getJSONObject(i).getString("place_id");
 
-            list.add(new entity(jsonArray.getJSONObject(i).getString("icon"), jsonArray.getJSONObject(i).getString("name"), jsonArray.getJSONObject(i).getString("vicinity")));
+            if (sp.contains(place_id)){
+                list.add(new entity(jsonArray.getJSONObject(i).getString("icon"), jsonArray.getJSONObject(i).getString("name"), jsonArray.getJSONObject(i).getString("vicinity"),1));
+
+            }else{
+                list.add(new entity(jsonArray.getJSONObject(i).getString("icon"), jsonArray.getJSONObject(i).getString("name"), jsonArray.getJSONObject(i).getString("vicinity"),0));
+
+            }
+
         }
 
         return list;

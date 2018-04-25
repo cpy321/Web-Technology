@@ -84,7 +84,7 @@ public class reviewFragment extends Fragment {
 
         }
 
-        if(yelpObj !=null && yelpObj.get("failed") == null){
+        if(!yelpObj.isNullObject() && yelpObj.get("failed") == null){
             String yelp = yelpObj.get("reviews").toString();
             initYelp = JSONArray.fromObject(yelp);
 

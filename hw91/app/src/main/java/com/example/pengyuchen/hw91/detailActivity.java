@@ -4,7 +4,9 @@ package com.example.pengyuchen.hw91;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 
@@ -13,6 +15,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -21,6 +24,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -32,15 +36,25 @@ import com.android.volley.toolbox.Volley;
 
 import net.sf.json.JSONObject;
 
+import java.net.URLEncoder;
+
 
 public class detailActivity extends AppCompatActivity{
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private SharedPreferences sp;
     private ViewPager mViewPager;
     private String detail;
     private String placeId;
     private String yelp;
-    private JSONObject detailObj;
+
+    private String placeUrl="#";
+    private String address;
+    private String name;
+    private String icon;
+    private String saveJson;
+
+
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -51,17 +65,29 @@ public class detailActivity extends AppCompatActivity{
         
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        //resultJson = JSONObject.fromObject(result);
-        //toolbar.setTitle(result);
+
+
         String detailJson = bundle.getString("fromResult");
         setPlaceId( bundle.getString("fromResultPlaceId"));
+        address = bundle.getString("fromResultAddress");
+        name = bundle.getString("fromResultPlaceName");
+        icon = bundle.getString("fromResultIcon");
 
         setmTitle(detailJson);
-        detailObj = JSONObject.fromObject(detailJson);
-        JSONObject resultObj = (JSONObject)detailObj.get("result");
-        String address = resultObj.get("formatted_address").toString();
-        String title = resultObj.get("name").toString();
-        toolbar.setTitle(title);
+
+
+        if(JSONObject.fromObject(detailJson).get("result").toString().equals("OK")) {
+
+            JSONObject resultObj = (JSONObject) JSONObject.fromObject(detailJson).get("result");
+
+            if (resultObj.get("website") != null) {
+                placeUrl = resultObj.get("website").toString();
+            } else {
+                placeUrl = resultObj.get("url").toString();
+            }
+        }
+
+        toolbar.setTitle(name);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -72,7 +98,7 @@ public class detailActivity extends AppCompatActivity{
             }
         });
         toolbar.setOnMenuItemClickListener(onMenuItemClick);
-        //Log.v("msg", detailJson);
+
 
 
         // Create the adapter that will return a fragment for each of the three
@@ -88,7 +114,7 @@ public class detailActivity extends AppCompatActivity{
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
 
 
-        String url = "http://place-env.us-west-1.elasticbeanstalk.com/yelp?formatted_address="+address+"&name="+title;
+        String url = "http://place-env.us-west-1.elasticbeanstalk.com/yelp?formatted_address="+address+"&name="+name;
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<org.json.JSONObject>() {
                     @Override
@@ -139,10 +165,27 @@ public class detailActivity extends AppCompatActivity{
             String msg = "";
             switch (menuItem.getItemId()) {
                 case R.id.action_share:
-                    msg += "Click edit";
+                    String url = "https://twitter.com/intent/tweet?text="+"Check out "+name+" located at "+address+". Website: "+placeUrl+"&hashtags=TravelAndEntertainmentSearch";
+                    Uri uri = Uri.parse(url);
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    detailActivity.this.startActivity(intent);
                     break;
                 case R.id.action_like:
-                    msg += "Click share";
+                    sp = getSharedPreferences("Favorite", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    saveJson ="{\"icon\":\""+icon+"\", \"name\": \""+ name+"\", \"place_id\": \"" + placeId + "\", \"vicinity\": \"" + address + "\" }";
+
+                    if(menuItem.getIcon().getCurrent().getConstantState()==getResources().getDrawable(R.drawable.heart_outline_white).getConstantState()){
+                        menuItem.setIcon(R.drawable.heart_fill_white);
+                        editor.putString(placeId,saveJson);
+
+                    }else{
+                        menuItem.setIcon(R.drawable.heart_outline_white);
+                        editor.remove(placeId);
+                    }
+                    editor.commit();
+
+
                     break;
 
             }
@@ -158,8 +201,23 @@ public class detailActivity extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+
         getMenuInflater().inflate(R.menu.menu_detail, menu);
+
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // 动态设置ToolBar状态
+
+        sp = getSharedPreferences("Favorite", Context.MODE_PRIVATE);
+        if(sp.contains(placeId)){
+            menu.findItem(R.id.action_like).setIcon(R.drawable.heart_fill_white);
+        }else{
+            menu.findItem(R.id.action_like).setIcon(R.drawable.heart_outline_white);
+        }
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override

@@ -1,12 +1,9 @@
 package com.example.pengyuchen.hw91;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,31 +12,34 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 
-
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
+public class MyAdapter2 extends RecyclerView.Adapter<MyAdapter2.ViewHolder>{
 
     private ArrayList<entity> mData;
-    private MyAdapter.OnItemClickListener onItemClickListener;
-    private SharedPreferences sp;
+    private MyAdapter2.OnItemClickListener onItemClickListener;
 
-    public MyAdapter(ArrayList<entity> data) {
+
+    public MyAdapter2(ArrayList<entity> data) {
         this.mData = data;
     }
 
+    public void updateData(ArrayList<entity> data) {
+        this.mData = data;
+        notifyDataSetChanged();
+    }
 
     public interface OnItemClickListener {
         void onItemLike(ImageView view, int position);
         void onItemDetail(View view, int position);
     }
 
-    public void setOnItemClickListener(MyAdapter.OnItemClickListener listener) {
+    public void setOnItemClickListener(MyAdapter2.OnItemClickListener listener) {
         this.onItemClickListener = listener;
     }
 
         @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // 实例化展示的view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_rv_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_rv_item2, parent, false);
         // 实例化viewholder
         ViewHolder viewHolder = new ViewHolder(v);
 
@@ -77,15 +77,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
         Picasso.get().load(mData.get(position).getItem1()).resize(110, 110).into(vh.getTv_Item1());
         vh.getTv_Item2().setText(mData.get(position).getItem2());
         vh.getTv_Item3().setText(mData.get(position).getItem3());
-
-        int isLike = mData.get(position).getItem4();
-
-        if(isLike == 0){
-            vh.getTv_Item4().setImageResource(R.drawable.heart_black);
-        }else{
-            vh.getTv_Item4().setImageResource(R.drawable.heart_fill_red);
-        }
-
     }
 
     @Override
@@ -98,7 +89,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
         public final ImageView tv_sheetRow1;
         public final TextView tv_sheetRow2;
         public final TextView tv_sheetRow3;
-        public final ImageView tv_sheetRow4;
 
 
         public ViewHolder(View itemView) {
@@ -107,8 +97,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
             tv_sheetRow1 = (ImageView) itemView.findViewById(R.id.resultcol1);
             tv_sheetRow2 = (TextView) itemView.findViewById(R.id.resultcol2);
             tv_sheetRow3 = (TextView) itemView.findViewById(R.id.resultcol3);
-            tv_sheetRow4 = (ImageView) itemView.findViewById(R.id.resultcol4);
-
         }
 
         public ImageView getTv_Item1() {
@@ -121,10 +109,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
 
         public TextView getTv_Item3() {
             return tv_sheetRow3;
-        }
-
-        public ImageView getTv_Item4() {
-            return tv_sheetRow4;
         }
     }
 
