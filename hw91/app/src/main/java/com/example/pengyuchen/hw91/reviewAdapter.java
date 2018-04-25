@@ -2,6 +2,7 @@ package com.example.pengyuchen.hw91;
 
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,14 +12,15 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
+import java.util.Date;
 
 
 public class reviewAdapter extends RecyclerView.Adapter<reviewAdapter.ViewHolder>{
 
     private ArrayList<entity2> mData;
-    private MyAdapter.OnItemClickListener onItemClickListener;
+    private reviewAdapter.OnItemClickListener onItemClickListener;
 
 
     public reviewAdapter(ArrayList<entity2> data) {
@@ -31,11 +33,10 @@ public class reviewAdapter extends RecyclerView.Adapter<reviewAdapter.ViewHolder
     }
 
     public interface OnItemClickListener {
-        void onItemLike(ImageView view, int position);
-        void onItemDetail(View view, int position);
+        void onItemClick(View view, int position);
     }
 
-    public void setOnItemClickListener(MyAdapter.OnItemClickListener listener) {
+    public void setOnItemClickListener(reviewAdapter.OnItemClickListener listener) {
         this.onItemClickListener = listener;
     }
 
@@ -53,34 +54,35 @@ public class reviewAdapter extends RecyclerView.Adapter<reviewAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, final int position) {
         // 绑定数据
         final ViewHolder vh = (ViewHolder)  holder;
-//        final ImageView heartView = vh.itemView.findViewById(R.id.resultcol4);
-//        final View detailView= (View)vh.itemView.findViewById(R.id.detailView);
-//
-//        heartView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(final View v) {
-//                if(onItemClickListener != null) {
-//                    int pos = vh.getLayoutPosition();
-//                    onItemClickListener.onItemLike(heartView, pos);
-//                }
-//            }
-//        });
-//
-//        detailView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(final View v) {
-//                if(onItemClickListener != null) {
-//                    int pos = vh.getLayoutPosition();
-//                    onItemClickListener.onItemDetail(detailView, pos);
-//                }
-//            }
-//        });
+        final View itemView = vh.itemView;
+
+
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if(onItemClickListener != null) {
+                    int pos = vh.getLayoutPosition();
+                    onItemClickListener.onItemClick(itemView, pos);
+                }
+            }
+        });
+
 
 
         Picasso.get().load(mData.get(position).getItem1()).resize(110, 110).into(vh.getTv_Item1());
         vh.getTv_Item2().setText(mData.get(position).getItem2());
         vh.getTv_Item3().setRating(Float.parseFloat(mData.get(position).getItem3()));
-        vh.getTv_Item4().setText(mData.get(position).getItem4());
+        String milSecond = mData.get(position).getItem4();
+        if(milSecond.length() == 10){
+            Long time = Long.parseLong(milSecond) * 1000L;
+            Date date = new Date(time);
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            vh.getTv_Item4().setText(format.format(date));
+        }else{
+            vh.getTv_Item4().setText(milSecond);
+        }
+
+
         vh.getTv_Item5().setText(mData.get(position).getItem5());
     }
 

@@ -1,6 +1,7 @@
 package com.example.pengyuchen.hw91;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -16,12 +17,17 @@ import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import net.sf.json.JSONObject;
@@ -33,6 +39,7 @@ public class detailActivity extends AppCompatActivity{
     private ViewPager mViewPager;
     private String detail;
     private String placeId;
+    private String yelp;
     private JSONObject detailObj;
 
     @Override
@@ -52,6 +59,7 @@ public class detailActivity extends AppCompatActivity{
         setmTitle(detailJson);
         detailObj = JSONObject.fromObject(detailJson);
         JSONObject resultObj = (JSONObject)detailObj.get("result");
+        String address = resultObj.get("formatted_address").toString();
         String title = resultObj.get("name").toString();
         toolbar.setTitle(title);
 
@@ -78,10 +86,25 @@ public class detailActivity extends AppCompatActivity{
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
-//        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-//        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
 
+        String url = "http://place-env.us-west-1.elasticbeanstalk.com/yelp?formatted_address="+address+"&name="+title;
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<org.json.JSONObject>() {
+                    @Override
+                    public void onResponse(org.json.JSONObject response) {
+                    setYelp(response.toString());
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+
+                    }
+                });
+        queue.add(jsonObjectRequest);
     }
 
 
@@ -99,6 +122,14 @@ public class detailActivity extends AppCompatActivity{
 
     public void setPlaceId(String placeId) {
         this.placeId = placeId;
+    }
+
+    public String getYelp() {
+        return yelp;
+    }
+
+    public void setYelp(String placeId) {
+        this.yelp = placeId;
     }
 
 
