@@ -35,18 +35,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.AutocompleteFilter;
-import com.google.android.gms.location.places.AutocompletePrediction;
-import com.google.android.gms.location.places.AutocompletePredictionBufferResponse;
-import com.google.android.gms.location.places.GeoDataClient;
-import com.google.android.gms.location.places.Place;
+import com.google.android.gms.common.ConnectionResult;
+
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.location.places.ui.PlaceAutocomplete;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+
 
 import org.json.JSONObject;
 
@@ -55,10 +50,24 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
 
 
-public class searchFragment extends Fragment {
+public class searchFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener
+        {
+
     private LocationManager locationManager;
     int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
-
+    private PlaceAutocompleteAdapter mPlaceAutocompleteAdapter;
+    private EditText keyword;
+    private EditText distance;
+    private AutoCompleteTextView location;
+    private Spinner category;
+    private RadioButton radio1;
+    private RadioButton radio2;
+    private GoogleApiClient mGoogleApiClient;
+    private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(
+                    new LatLng(-40, -168), new LatLng(71, 136));
+            @Override
+            public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+            }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,16 +75,17 @@ public class searchFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.search, container, false);
         final RequestQueue queue = Volley.newRequestQueue(getActivity());
 
+        keyword = (EditText) rootView.findViewById(R.id.keyword);
+        distance = (EditText) rootView.findViewById(R.id.distance);
+        location =(AutoCompleteTextView)rootView.findViewById(R.id.location);
+        category = (Spinner)rootView.findViewById(R.id.category);
+        radio1 = (RadioButton) rootView.findViewById(R.id.radio1);
+        radio2 = (RadioButton) rootView.findViewById(R.id.radio2);
+
         Button search = (Button) rootView.findViewById(R.id.search);
         search.setOnClickListener(new View.OnClickListener() {
               @Override
               public void onClick(View v) {
-                 EditText keyword = (EditText) rootView.findViewById(R.id.keyword);
-                 EditText distance = (EditText) rootView.findViewById(R.id.distance);
-                 AutoCompleteTextView location =(AutoCompleteTextView)rootView.findViewById(R.id.location);
-                 Spinner category = (Spinner)rootView.findViewById(R.id.category);
-                  RadioButton radio1 = (RadioButton) rootView.findViewById(R.id.radio1);
-                  RadioButton radio2 = (RadioButton) rootView.findViewById(R.id.radio2);
 
                   String lon =Double.toString(MainActivity.lon);
                   String lat =Double.toString(MainActivity.lat);
@@ -180,29 +190,16 @@ public class searchFragment extends Fragment {
         });
 
 
+        mGoogleApiClient = new GoogleApiClient
+                .Builder(getActivity())
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .enableAutoManage(getActivity(), this)
+                .build();
+        mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(getActivity(),mGoogleApiClient,LAT_LNG_BOUNDS, null);
 
+        location.setAdapter(mPlaceAutocompleteAdapter);
 
-
-//        try {
-//            Intent intent =
-//                    new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
-//                            .build(getActivity());
-//            startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
-//        } catch (Exception e) {
-//            Log.e(TAG, e.getStackTrace().toString());
-//        }
-
-
-
-//        public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//            if(requestCode == 2){
-//                if (resultCode == RESULT_OK) {
-//                    Place place = PlaceAutocomplete.getPlace(getActivity(), data);
-//                    Toast.makeText(getActivity(), "place "+place.toString(),
-//                            Toast.LENGTH_LONG).show();
-//                }
-//            }
-//        }
 
 
 
@@ -212,16 +209,6 @@ public class searchFragment extends Fragment {
     }
 
 
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if(requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE){
-//            if (resultCode == RESULT_OK) {
-//                Place place = PlaceAutocomplete.getPlace(getActivity(), data);
-//                Toast.makeText(getActivity(), "place "+place.toString(),
-//                        Toast.LENGTH_LONG).show();
-//            }
-//        }
-//    }
 
 
 

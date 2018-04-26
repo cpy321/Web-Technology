@@ -92,7 +92,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
-        android:ems="10"
+        android:singleLine="true"
         android:enabled="false"
         android:hint="Type in the Location"
         android:inputType="textPersonName" />

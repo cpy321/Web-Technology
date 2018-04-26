@@ -11,11 +11,11 @@
         android:layout_height="wrap_content"
         android:text="From" />
 
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/start"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
+        android:singleLine="true"
         android:hint="Type in the Location"
          />
     <TextView
