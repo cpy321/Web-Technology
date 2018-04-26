@@ -42,5 +42,11 @@
         <item>Most Recent</item>
         <item>Least Recent</item>
     </string-array>
+    <string-array name="mode">
+        <item>Driving</item>
+        <item>Bicycling</item>
+        <item>Transit</item>
+        <item>Walking</item>
+    </string-array>
 
 </resources>

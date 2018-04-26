@@ -53,6 +53,8 @@ public class detailActivity extends AppCompatActivity{
     private String name;
     private String icon;
     private String saveJson;
+    private String lat;
+    private String lon;
 
 
 
@@ -72,6 +74,9 @@ public class detailActivity extends AppCompatActivity{
         address = bundle.getString("fromResultAddress");
         name = bundle.getString("fromResultPlaceName");
         icon = bundle.getString("fromResultIcon");
+        lat = bundle.getString("fromResultLat");
+        lon = bundle.getString("fromResultLon");
+
 
         setmTitle(detailJson);
 
@@ -157,6 +162,12 @@ public class detailActivity extends AppCompatActivity{
     public void setYelp(String placeId) {
         this.yelp = placeId;
     }
+
+    public String getLon(){ return lon;}
+
+    public String getLat(){ return lat;}
+
+    public String getName(){return name;}
 
 
     private Toolbar.OnMenuItemClickListener onMenuItemClick = new Toolbar.OnMenuItemClickListener() {

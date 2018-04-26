@@ -145,7 +145,6 @@ public class resultActivity extends AppCompatActivity {
     }
 
     @Override
-
     public void onResume(){
         super.onResume();
         initData();
@@ -210,6 +209,10 @@ public class resultActivity extends AppCompatActivity {
                     final String name = likeArray.getJSONObject(position).getString("name").toString();
                     final String vicinity = likeArray.getJSONObject(position).getString("vicinity").toString();
                     final String icon = likeArray.getJSONObject(position).getString("icon").toString();
+                    JSONObject geometry = (JSONObject)likeArray.getJSONObject(position).get("geometry");
+                    JSONObject location = (JSONObject)geometry.get("location");
+                    final String lat = location.getString("lat");
+                    final String lon = location.getString("lng");
 
 
                     String url = "http://place-env.us-west-1.elasticbeanstalk.com/detail?place_id="+placeId;
@@ -225,6 +228,9 @@ public class resultActivity extends AppCompatActivity {
                                     intent.putExtra("fromResultPlaceName", name);
                                     intent.putExtra("fromResultAddress",vicinity);
                                     intent.putExtra("fromResultIcon",icon);
+                                    intent.putExtra("fromResultLat",lat);
+                                    intent.putExtra("fromResultLon",lon);
+
                                     startActivity(intent);
                                     pDialog.hide();
 
