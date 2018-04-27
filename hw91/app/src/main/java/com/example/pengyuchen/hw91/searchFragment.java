@@ -145,6 +145,9 @@ public class searchFragment extends Fragment implements GoogleApiClient.OnConnec
 
                                   @Override
                                   public void onErrorResponse(VolleyError error) {
+                                      pDialog.hide();
+                                      Toast.makeText(getActivity(), "NetWork error", Toast.LENGTH_LONG).show();
+
                                       Log.v("msg", error.toString());
 
                                   }
@@ -167,6 +170,12 @@ public class searchFragment extends Fragment implements GoogleApiClient.OnConnec
             public void onClick(View v) {
                 rootView.findViewById(R.id.warning1).setVisibility(TextView.GONE);
                 rootView.findViewById(R.id.warning2).setVisibility(TextView.GONE);
+                keyword.setText("");
+                distance.setText("");
+                location.setText("");
+                category.setSelection(0);
+                radio1.setChecked(true);
+
             }
 
         });

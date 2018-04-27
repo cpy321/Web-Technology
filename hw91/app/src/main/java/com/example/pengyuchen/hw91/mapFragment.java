@@ -76,6 +76,7 @@ public class mapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
 
         startEditor = rootView.findViewById(R.id.start);
 
+
         mGoogleApiClient = new GoogleApiClient
                 .Builder(getActivity())
                 .addApi(Places.GEO_DATA_API)

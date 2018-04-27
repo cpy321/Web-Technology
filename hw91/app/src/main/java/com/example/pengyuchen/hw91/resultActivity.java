@@ -185,15 +185,19 @@ public class resultActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = sp.edit();
                     String key = likeArray.getJSONObject(position).getString("place_id").toString();
                     String val = likeArray.getJSONObject(position).toString();
+                    String name = likeArray.getJSONObject(position).getString("name");
 
                     if(view.getDrawable().getCurrent().getConstantState()==getResources().getDrawable(R.drawable.heart_black).getConstantState()){
                         view.setImageResource(R.drawable.heart_fill_red);
 
                         editor.putString(key, val);
+                        Toast.makeText(resultActivity.this, name+" was added to favorites", Toast.LENGTH_LONG).show();
 
                     }else{
                         view.setImageResource(R.drawable.heart_black);
                         editor.remove(key);
+                        Toast.makeText(resultActivity.this, name+" was removed to favorites", Toast.LENGTH_LONG).show();
+
                     }
                     editor.commit();
 
@@ -203,17 +207,17 @@ public class resultActivity extends AppCompatActivity {
                 public void onItemDetail(View view, int position) {
                     final ProgressDialog pDialog = new ProgressDialog(resultActivity.this);
                     final RequestQueue queue = Volley.newRequestQueue(resultActivity.this);
-                    pDialog.setMessage("Fetching details");
-                    pDialog.show();
-                    final String placeId = likeArray.getJSONObject(position).getString("place_id").toString();
-                    final String name = likeArray.getJSONObject(position).getString("name").toString();
-                    final String vicinity = likeArray.getJSONObject(position).getString("vicinity").toString();
-                    final String icon = likeArray.getJSONObject(position).getString("icon").toString();
+                    final String placeId = likeArray.getJSONObject(position).getString("place_id");
+                    final String name = likeArray.getJSONObject(position).getString("name");
+                    final String vicinity = likeArray.getJSONObject(position).getString("vicinity");
+                    final String icon = likeArray.getJSONObject(position).getString("icon");
                     JSONObject geometry = (JSONObject)likeArray.getJSONObject(position).get("geometry");
                     JSONObject location = (JSONObject)geometry.get("location");
                     final String lat = location.getString("lat");
                     final String lon = location.getString("lng");
 
+                    pDialog.setMessage("Fetching details");
+                    pDialog.show();
 
                     String url = "http://place-env.us-west-1.elasticbeanstalk.com/detail?place_id="+placeId;
                     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -223,6 +227,7 @@ public class resultActivity extends AppCompatActivity {
                                     String detailJson=response.toString();
                                     Intent intent = new Intent();
                                     intent.setClass(resultActivity.this, detailActivity.class);
+
                                     intent.putExtra("fromResult", detailJson);
                                     intent.putExtra("fromResultPlaceId", placeId);
                                     intent.putExtra("fromResultPlaceName", name);
@@ -232,6 +237,7 @@ public class resultActivity extends AppCompatActivity {
                                     intent.putExtra("fromResultLon",lon);
 
                                     startActivity(intent);
+
                                     pDialog.hide();
 
                                     //Log.v("msg", detailJson);
@@ -242,10 +248,7 @@ public class resultActivity extends AppCompatActivity {
                                 @Override
                                 public void onErrorResponse(VolleyError error) {
                                     Log.v("msg", error.toString());
-                                    Intent intent = new Intent();
-                                    intent.setClass(resultActivity.this, detailActivity.class);
-                                    intent.putExtra("fromResult", "error");
-                                    startActivity(intent);
+                                    Toast.makeText(resultActivity.this, "Network error", Toast.LENGTH_LONG).show();
                                     pDialog.hide();
 
                                 }

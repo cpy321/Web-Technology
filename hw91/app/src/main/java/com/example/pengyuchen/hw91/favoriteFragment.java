@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -31,6 +32,8 @@ import com.android.volley.toolbox.Volley;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -38,6 +41,7 @@ public class favoriteFragment extends  Fragment {
     private RecyclerView mRecyclerView;
     private MyAdapter2 mAdapter;
     private View rootView;
+    private TextView resultWarning;
     private RecyclerView.LayoutManager mLayoutManager;
     private SharedPreferences sp;
     public ArrayList<String> resultData= new ArrayList<>();
@@ -54,25 +58,37 @@ public class favoriteFragment extends  Fragment {
         return rootView;
     }
 
-    @Override public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser){
+    @Override
+    public void onResume() {
+        super.onResume();
+
             initData();
             initView();
 
-        }
+
     }
 
 
     private void initData() {
         resultData.clear();
+        resultWarning = rootView.findViewById(R.id.resultWarning);
         sp = getActivity().getSharedPreferences("Favorite", Context.MODE_PRIVATE);
-        if(sp !=null) {
+
+
             Map<String, ?> allEntries = sp.getAll();
-            for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-                resultData.add(entry.getValue().toString());
+
+            if(allEntries.size() != 0 ){
+
+                for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+                    resultData.add(entry.getValue().toString());
+                }
+                resultWarning.setVisibility(TextView.GONE);
+            }else{
+                resultWarning.setVisibility(TextView.VISIBLE);
             }
-        }
+
+
+
 
 
 
@@ -83,10 +99,13 @@ public class favoriteFragment extends  Fragment {
                 @Override
                 public void onItemLike(ImageView view, int position) {
                     SharedPreferences.Editor editor = sp.edit();
+                    String name = JSONObject.fromObject(resultData.get(position)).getString("name");
                     editor.remove(JSONObject.fromObject(resultData.get(position)).get("place_id").toString());
                     editor.commit();
                     initData();
                     initView();
+                    Toast.makeText(getActivity(), name+" was removed to favorites", Toast.LENGTH_LONG).show();
+
                 }
 
                 @Override
@@ -97,6 +116,14 @@ public class favoriteFragment extends  Fragment {
                     pDialog.show();
 
                     final String placeId = JSONObject.fromObject(resultData.get(position)).get("place_id").toString();
+                    final String name = JSONObject.fromObject(resultData.get(position)).getString("name");
+                    final String vicinity = JSONObject.fromObject(resultData.get(position)).getString("vicinity");
+                    final String icon = JSONObject.fromObject(resultData.get(position)).getString("icon");
+                    JSONObject geometry = JSONObject.fromObject(resultData.get(position)).getJSONObject("geometry");
+                    JSONObject location = geometry.getJSONObject("location");
+                    final String lat = location.getString("lat");
+                    final String lon = location.getString("lng");
+
 
                     String url = "http://place-env.us-west-1.elasticbeanstalk.com/detail?place_id="+placeId;
                     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -108,6 +135,11 @@ public class favoriteFragment extends  Fragment {
                                     intent.setClass(getActivity(), detailActivity.class);
                                     intent.putExtra("fromResult", detailJson);
                                     intent.putExtra("fromResultPlaceId", placeId);
+                                    intent.putExtra("fromResultPlaceName", name);
+                                    intent.putExtra("fromResultAddress",vicinity);
+                                    intent.putExtra("fromResultIcon",icon);
+                                    intent.putExtra("fromResultLat",lat);
+                                    intent.putExtra("fromResultLon",lon);
                                     startActivity(intent);
                                     pDialog.hide();
 

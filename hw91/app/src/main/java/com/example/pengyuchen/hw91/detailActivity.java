@@ -81,7 +81,7 @@ public class detailActivity extends AppCompatActivity{
         setmTitle(detailJson);
 
 
-        if(JSONObject.fromObject(detailJson).get("result").toString().equals("OK")) {
+        if(JSONObject.fromObject(detailJson).get("status").toString().equals("OK")) {
 
             JSONObject resultObj = (JSONObject) JSONObject.fromObject(detailJson).get("result");
 
@@ -184,15 +184,19 @@ public class detailActivity extends AppCompatActivity{
                 case R.id.action_like:
                     sp = getSharedPreferences("Favorite", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sp.edit();
-                    saveJson ="{\"icon\":\""+icon+"\", \"name\": \""+ name+"\", \"place_id\": \"" + placeId + "\", \"vicinity\": \"" + address + "\" }";
+                    saveJson ="{\"icon\":\""+icon+"\", \"name\": \""+ name+"\", \"place_id\": \"" + placeId + "\", \"vicinity\": \"" + address + "\", \"geometry\": {\"location\":{\"lat\":\""+lat+"\",\"lng\":\""+lon+"\" } } }";
 
                     if(menuItem.getIcon().getCurrent().getConstantState()==getResources().getDrawable(R.drawable.heart_outline_white).getConstantState()){
                         menuItem.setIcon(R.drawable.heart_fill_white);
                         editor.putString(placeId,saveJson);
+                        Toast.makeText(detailActivity.this, name+" was added to favorites", Toast.LENGTH_LONG).show();
+
 
                     }else{
                         menuItem.setIcon(R.drawable.heart_outline_white);
                         editor.remove(placeId);
+                        Toast.makeText(detailActivity.this, name+" was removed  favorites", Toast.LENGTH_LONG).show();
+
                     }
                     editor.commit();
 

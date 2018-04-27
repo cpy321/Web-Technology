@@ -79,24 +79,39 @@ public class MainActivity extends AppCompatActivity {
 
 
         locationManager=(LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION};
 
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.v("error", Manifest.permission.ACCESS_FINE_LOCATION);
+        if(ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            if(ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                Location location=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if(location!=null){
+                    lon = location.getLongitude();
+                    lat = location.getLatitude();
+                    String currentPosition="latitude is"+lat+"\n"+"longitude is"+lon;
+                    Log.v("msg",currentPosition);
+                }else{
+                    Toast.makeText(this, "Cannot get your location", Toast.LENGTH_LONG).show();
 
+                }
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,10,locationListener);
+
+
+            }else{
+                ActivityCompat.requestPermissions(this,
+                        permissions,
+                        1234);
+            }
+        }else{
+            ActivityCompat.requestPermissions(this,
+                    permissions,
+                    1234);
         }
 
 
 
-        Location location=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if(location!=null){
-            lon = location.getLongitude();
-            lat = location.getLatitude();
-            String currentPosition="latitude is"+lat+"\n"+"longitude is"+lon;
-            Log.v("msg",currentPosition);
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,10,locationListener);
 
     }
 
